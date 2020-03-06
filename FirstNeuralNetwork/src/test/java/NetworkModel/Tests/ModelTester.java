@@ -1,6 +1,5 @@
 package NetworkModel.Tests;
 
-import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import NetworkModel.Matrix2D;
