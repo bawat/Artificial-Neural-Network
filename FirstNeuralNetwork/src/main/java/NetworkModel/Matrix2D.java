@@ -1,20 +1,19 @@
 package NetworkModel;
 import java.util.Arrays;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
-public class Matrix2D {
+public class Matrix2D implements Mappable<Matrix2D>{
 	public double[][] storedMatrix;
-	Matrix2D(int rows, int columns){
+	public Matrix2D(int rows, int columns){
 		storedMatrix = new double[rows][columns];
 	}
-	Matrix2D(double[][] matrix){
+	public Matrix2D(double[][] matrix){
 		storedMatrix = Arrays.stream(matrix).map(double[]::clone).toArray(double[][]::new);
 	}
-	Matrix2D(Builder builder){
+	public Matrix2D(Builder builder){
 		storedMatrix = builder.storedMatrix;
 	}
-	Matrix2D(Matrix2D toClone){
+	public Matrix2D(Matrix2D toClone){
 		this(toClone.storedMatrix);
 	}
 	
@@ -70,7 +69,7 @@ public class Matrix2D {
 	}
 	public Matrix2D matrixMultiply(Matrix2D mat2) throws Exception{
 		if(columns() != mat2.rows()) {
-			throw new Exception("Incorrect Maxtrix sizes for multiplation");
+			throw new Exception("Incorrect Maxtrix sizes for multiplation " + rows() +"x"+ columns() + " dot " + mat2.rows() +"x"+ mat2.columns());
 		}
 		
 		Matrix2D result = new Matrix2D(rows(),mat2.columns());
@@ -220,7 +219,7 @@ public class Matrix2D {
 		
 		return result;
 	}
-	public void destructiveUpdate(Matrix2D other) {
+	public void destructiveAdd(Matrix2D other) {
 		storedMatrix = add(other).storedMatrix;
 	}
 	public Matrix2D weirdEndThingAndAverageVertically(Matrix2D x) throws Exception {
@@ -267,6 +266,20 @@ public class Matrix2D {
 		
 		for(int row = 0; row < result.rows(); row++) {
 			result.storedMatrix[row] = storedMatrix[0].clone();
+		}
+		
+		return result;
+	}
+	public Vector1D toVector() {
+		if(!(1 == rows() || 1 == columns())) {
+			throw new RuntimeException("Can't convert at " +  rows() + "x" + columns() + " matrix to a vector.");
+		}
+		
+		int vectorSize = Math.max(rows(), columns());
+		Vector1D result = new Vector1D(vectorSize);
+		
+		for(int i = 0; i < vectorSize; i++) {
+			result.set(i, storedMatrix[i%rows()][i%columns()]);
 		}
 		
 		return result;

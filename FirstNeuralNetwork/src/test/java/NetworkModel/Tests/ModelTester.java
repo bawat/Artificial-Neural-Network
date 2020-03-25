@@ -1,53 +1,43 @@
 package NetworkModel.Tests;
 
-import org.testng.annotations.Test;
+import org.junit.Test;
 
-import NetworkModel.Matrix2D;
 import NetworkModel.NeuralLayer;
 import NetworkModel.NeuralNetwork;
+import NetworkModel.ResultSet;
+import NetworkModel.TrainingData;
 
 public class ModelTester {
 
 	@Test
 	public void twoHiddenLayersDerived() throws Exception {
 		
-		NeuralNetwork gradeEstimator = new NeuralNetwork.Builder(new NeuralLayer(2))
+		NeuralNetwork gradeEstimator = new NeuralNetwork.addInputLayer(new NeuralLayer(2))
 				.addHiddenLayer(new NeuralLayer(3))
 				.addHiddenLayer(new NeuralLayer(2))
 				.addOutputLayer(new NeuralLayer(2));
-
-		Matrix2D inputMatrix = new Matrix2D.Builder()
-			.addRow(3, 5)
-			.addRow(5, 1)
-			//.addRow(10, 2)
-			.build();
-		Matrix2D maxValues = new Matrix2D.Builder()
-			.addRow(24, 24)
-			.build();
-		inputMatrix = inputMatrix.normaliseVerticallyWith(maxValues);
 		
-		Matrix2D outputMatrix = new Matrix2D.Builder()
-			.addRow(90, 10)
-			.addRow(14, 80)
-			//.addRow(70, 30)
-			.build();
-		Matrix2D maxValue = new Matrix2D.Builder()
-			.addRow(100, 100)
-			.build();
-		outputMatrix = outputMatrix.normaliseVerticallyWith(maxValue);
+		TrainingData data = new TrainingData.Builder()
+			.input(3d, 5d).mapsTo(24d, 28d)
+			.input(4d, 6d).mapsTo(40d, 50d)
+			
+			.normaliseInputs(24d, 24d)
+			.normaliseOutputs(100d, 100d);
 		
-		Matrix2D estimatedGrade = gradeEstimator.forwardPropagation(inputMatrix);
 		
-		System.out.println(estimatedGrade);
-		int iterationNumber = 10;
-		//while(!estimatedGrade.equals(outputMatrix, 0.001d)) {
-		for(int i = 0; i < 200; i++) {
-			gradeEstimator.backPropagationTraining(inputMatrix, outputMatrix, iterationNumber);
-			iterationNumber *= 1.1;// Adaptive Global Learning rate https://youtu.be/4Gu4WZvqevc
-			estimatedGrade = gradeEstimator.forwardPropagation(inputMatrix);
+		
+		System.out.println("Starting training...");
+		int iterationNumber = 1;
+		ResultSet estimatedGrade = gradeEstimator.forwardPropagation(data);
+		//for(int i = 0; i < 100; i++) { //For testing
+		while(!estimatedGrade.equals(data, 0.001d)) {
+			iterationNumber++;
+			gradeEstimator.backPropagationTraining(data, 1);
+			//learningRate *= 1.1d;// Adaptive Global Learning rate https://youtu.be/4Gu4WZvqevc
+			estimatedGrade = gradeEstimator.forwardPropagation(data);
 			System.out.println("Estimate with learning rate " + iterationNumber + ": " + System.lineSeparator() + estimatedGrade);
 		}
-		
+		System.out.println("Training finished. Took " + iterationNumber + " iteratations. Result.");
 		System.out.println(estimatedGrade);
 		
 	}

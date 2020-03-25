@@ -1,7 +1,8 @@
 package NetworkModel;
 
-import org.testng.Assert;
-import org.testng.annotations.Test;
+import org.junit.Test;
+
+import junit.framework.Assert;
 
 
 public class Matrix2DTest {
@@ -122,26 +123,6 @@ public class Matrix2DTest {
 	    		.addRow(30)
 	    		.addRow(50)
 	    		.build().columns() , 1);
-  }
-
-  @Test
-  public void destructiveUpdate() {
-	  	Matrix2D initialMatrix = new Matrix2D.Builder()
-	    		.addRow(10, 20)
-	    		.addRow(30, 40)
-	    		.build();
-	    Matrix2D adderMatrix = new Matrix2D.Builder()
-	    		.addRow(1, 2)
-	    		.addRow(3, 4)
-	    		.build();
-	    
-	    initialMatrix.destructiveUpdate(adderMatrix);
-	    
-	    //Make sure the operation was non-destructive to the adding matrix
-	    Assert.assertEquals(adderMatrix.storedMatrix[0][0], 1.0f);
-	    
-	    //Make sure the operation was destructive
-	    Assert.assertEquals(initialMatrix.storedMatrix[0][0], 11.0f);
   }
 
   @Test
