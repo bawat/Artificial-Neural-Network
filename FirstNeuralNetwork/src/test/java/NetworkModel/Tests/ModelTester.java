@@ -27,15 +27,17 @@ public class ModelTester {
 		
 		
 		System.out.println("Starting training...");
-		int iterationNumber = 1;
+		
 		ResultSet estimatedGrade = gradeEstimator.forwardPropagation(data);
-		//for(int i = 0; i < 100; i++) { //For testing
-		while(!estimatedGrade.equals(data, 0.001d)) {
-			iterationNumber++;
-			gradeEstimator.backPropagationTraining(data, 1);
+		
+		int iterationNumber, learningRate = 1;
+		for(iterationNumber = 1; !estimatedGrade.equals(data, 0.001d); iterationNumber++) {
+			
+			gradeEstimator.backPropagationTraining(data, learningRate);
 			//learningRate *= 1.1d;// Adaptive Global Learning rate https://youtu.be/4Gu4WZvqevc
 			estimatedGrade = gradeEstimator.forwardPropagation(data);
-			System.out.println("Estimate with learning rate " + iterationNumber + ": " + System.lineSeparator() + estimatedGrade);
+			System.out.println("Estimate with learning rate " + learningRate + ": " + System.lineSeparator() + estimatedGrade);
+			System.out.println("Errors: " + gradeEstimator.calculateErrors(data).toString() + "");
 		}
 		System.out.println("Training finished. Took " + iterationNumber + " iteratations. Result.");
 		System.out.println(estimatedGrade);

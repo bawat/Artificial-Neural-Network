@@ -79,19 +79,39 @@ public class NeuralNetwork{
 	}
 	
 	public void backPropagationTraining(TrainingData data, double learningRate) throws Exception {
+		ResultSet result = forwardPropagation(data);
+		
 		Vector1D yHat, y;
-		int index = 0;
+		for(int index = 0; index < result.size(); index++) {
 		
-		//Aliasing
-		yHat = forwardPropagation(data.getNormalisedInput(index));
-		y = data.getNormalisedOutput(index);
+			//Aliasing
+			yHat = result.get(index);
+			y = data.getNormalisedOutput(index);
 		
-		//Collect all derivative data before modifying our model
-		layers.get(1).biases.get().calculateDerivativesForAll(yHat, y);
-		weights.calculateDerivativesForAll(yHat, y);
-
-		//Update Model
-		layers.stream().map(ele -> ele.biases).filter(biasVector -> biasVector.isPresent()).forEach(biasVector -> biasVector.get().updateBasedOnDerivative(learningRate));
-		weights.forEach(ele -> ele.updateBasedOnDerivative(learningRate));
+			//Collect all derivative data before modifying our model
+			layers.get(1).biases.get().calculateDerivativesForAll(yHat, y);
+			weights.calculateDerivativesForAll(yHat, y);
+	
+			//Update Model
+			layers.stream().map(ele -> ele.biases).filter(biasVector -> biasVector.isPresent()).forEach(biasVector -> biasVector.get().updateBasedOnDerivative(learningRate));
+			weights.forEach(ele -> ele.updateBasedOnDerivative(learningRate));
+		}
+	}
+	
+	public ArrayList<Double> calculateErrors(TrainingData data) throws Exception {
+		ArrayList<Double> errors = new ArrayList<Double>();
+		
+		for(int index = 0; index < data.mapping.size(); index++) {
+			Vector1D yHat = forwardPropagation(data.getNormalisedInput(index));
+			Vector1D y = data.getNormalisedOutput(index);
+			
+			double error = 0;
+			for(int neuron = 0; neuron < yHat.size(); neuron++) {
+				error += Math.pow(y.sub(yHat).get(neuron), 2);
+			}
+			errors.add(error);
+		}
+		
+		return errors;
 	}
 }
