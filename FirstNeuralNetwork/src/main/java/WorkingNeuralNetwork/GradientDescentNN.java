@@ -12,7 +12,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class BruteForceNN {
+public class GradientDescentNN {
 	public static void main(String[] args) {
 			NN.InputLayerNode 
 			n00 = new NN.InputLayerNode(0),
