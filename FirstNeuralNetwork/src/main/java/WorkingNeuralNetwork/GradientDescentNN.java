@@ -12,6 +12,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import WorkingNeuralNetwork.BruteForceNN.NN;
+
 public class GradientDescentNN {
 	public static void main(String[] args) {
 			NN.InputLayerNode 
@@ -184,9 +186,12 @@ public class GradientDescentNN {
     		for(NN.Node node : thisLayer) {
     			double postActivationValue = 0d;
     			for(NN.Node prevNode : prevLayer) {
-    				postActivationValue += NN.activationFunction.apply(prevBins.get(prevNode.nodeIndex)) * weightBetween(prevNode, node).value;
+    				postActivationValue += prevBins.get(prevNode.nodeIndex) * weightBetween(prevNode, node).value;
     			}
     			postActivationValue += biasAt(node).value;
+    			
+    			if(nodesInLayer(layer+1).size() != 0)
+    				postActivationValue = NN.activationFunction.apply(postActivationValue);
     			
     			bins.add(postActivationValue);
     		}

@@ -184,9 +184,12 @@ public class BruteForceNN {
     		for(NN.Node node : thisLayer) {
     			double postActivationValue = 0d;
     			for(NN.Node prevNode : prevLayer) {
-    				postActivationValue += NN.activationFunction.apply(prevBins.get(prevNode.nodeIndex)) * weightBetween(prevNode, node).value;
+    				postActivationValue += prevBins.get(prevNode.nodeIndex) * weightBetween(prevNode, node).value;
     			}
     			postActivationValue += biasAt(node).value;
+    			
+    			if(nodesInLayer(layer+1).size() != 0)
+    				postActivationValue = NN.activationFunction.apply(postActivationValue);
     			
     			bins.add(postActivationValue);
     		}
