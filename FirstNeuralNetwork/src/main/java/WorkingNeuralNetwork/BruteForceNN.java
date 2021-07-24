@@ -8,13 +8,15 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.Random;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class BruteForceNN {
 	public static void main(String[] args) {
-			NN.InputLayerNode 
+		NN.InputLayerNode 
 			n00 = new NN.InputLayerNode(0),
 		    n01 = new NN.InputLayerNode(1);
 		
@@ -59,6 +61,10 @@ public class BruteForceNN {
 		    
 			b30 = new NN.Bias(n30),
 		    b31 = new NN.Bias(n31);
+		
+		//LeCun Initialization
+		NN.initWeights((fanIn, fanOut) -> new Random().nextGaussian()/((double) fanIn));
+		NN.initBiases((fanIn, fanOut) -> new Random().nextGaussian()/((double) fanIn));
 		
 		//trainOneInput();
 		trainTwoInputs();
@@ -262,6 +268,19 @@ public class BruteForceNN {
     	
     	static Function<Double, Double> activationFunction = (val) -> 1d/(1d + Math.pow(Math.E,-val));
     	
+    	public static void initWeights(BiFunction<Integer, Integer, Double> initialisationFunction) {
+    		weights.forEach(weight -> weight.value = initialisationFunction.apply(
+    				nodesInLayer(weight.startNode.layer).size(),
+    				nodesInLayer(Math.min(weight.endNode.layer+1, outputLayer.get(0).layer)).size()
+    			));
+    	}
+    	public static void initBiases(BiFunction<Integer, Integer, Double> initialisationFunction) {
+    		biases.forEach(bias -> bias.value = initialisationFunction.apply(
+    				nodesInLayer(bias.parent.layer-1).size(),
+    				nodesInLayer(Math.min(bias.parent.layer+1, outputLayer.get(0).layer)).size()
+    			));
+    	}
+    	
     	private static class Node{
     		int layer;
     		int nodeIndex;
@@ -295,7 +314,6 @@ public class BruteForceNN {
 			Node startNode;
     		Node endNode;
     		{
-    			value = 0.5d/*Math.random()*/;
     			weights.add(this);
     		}
     		public Weight(Node from, Node to) {
@@ -306,7 +324,6 @@ public class BruteForceNN {
     	static class Bias extends NN.NNParameter{
     		Node parent;
     		{
-    			value = 0.5d/*Math.random()*/;
     			biases.add(this);
     		}
     		public Bias(OutputLayerNode parent) {
